@@ -1,43 +1,609 @@
-<!DOCTYPE HTML>
-<html>
-    <head>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chi-Chi Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --acc: #f152a2;
+  --acc2: #e040a0;
+  --acc-light: #f8b8de;
+  --acc-rgb: 241,82,162;
+  --bg: #0f0f13;
+  --bg2: #16161d;
+  --bg3: #1e1e28;
+  --border: rgba(241,82,162,0.18);
+  --text: #fff;
+  --text2: rgba(255,255,255,0.5);
+  --radius: 18px;
+  --font: 'Montserrat', sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-     <meta charset="utf-8">
-     <meta name="viewport" content="width=device-width, initial-scale= 1.0">
-     <link rel="stylesheet" href="style.css">
-     <title> Chi-Chi Search </title>
-     <link rel="icon" type="image/x-icon" href="">
-     <script src="script.js" defer></script>
-     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-     <script src="https://kit.fontawesome.com/35ad65d88e.js" crossorigin="anonymous"></script>
+/* PAGE */
+.page { display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1rem 6rem; gap: 1.4rem; }
 
-    </head>
-    <body>
-            
-        
-        
-        <div class="content">
-                <img class="logo" src="img/chi.png"></img>
-                <form action="https://www.google.com/search" method="get" class="search-bar">
-                    <input type="text" placeholder="Search websites" name="q">
-                    <button type="submit"><i class="fa-solid fa-magnifying-glass fa-xl" style="color: #292929;"></i></button>
-                </form>
-                <div class="news-content">
-                    
-                 <div class="news">
-                   <label class="categ">NEWS</label> 
-                   <script src="//rss.bloople.net/?url=http%3A%2F%2Ffeeds.feedburner.com%2Fign%2Fnews&detail=25&limit=10&showtitle=false&type=js"></script>
-                 </div>
-                 <div class="news">
-                    <label class="categ">FREE     GAMES</label> 
-                    <script src="//rss.bloople.net/?url=https%3A%2F%2Fwww.epicbundle.com%2Ffeed%2F&limit=10&showtitle=false&type=js"></script>
-                   
-        
-                </div>
-                </div>
-        </div>    
-    <script>
-    </script>   
-    </body>
+/* LOGO */
+.logo-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 4px; }
+.logo-svg { width: 320px; height: auto; }
+.tagline { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--text2); font-weight: 600; }
 
-    
+/* SEARCH */
+.search-outer { width: 100%; max-width: 680px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.search-row { display: flex; gap: 10px; width: 100%; }
+.search-wrap {
+  display: flex; align-items: center;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 6px 6px 22px;
+  flex: 1;
+  transition: border-color .25s, box-shadow .25s;
+}
+.search-wrap:focus-within {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px rgba(var(--acc-rgb), 0.15);
+}
+.search-wrap input {
+  background: transparent;
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 15px;
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 500;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.search-wrap input::placeholder { color: var(--text2); }
+.search-wrap input::-webkit-search-cancel-button,
+.search-wrap input::-webkit-search-decoration { display: none; }
+.btn-search {
+  background: var(--acc);
+  border: none;
+  border-radius: 50px;
+  padding: 0 24px;
+  height: 46px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background .2s, transform .1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-search:hover { background: var(--acc2); }
+.btn-search:active { transform: scale(0.97); }
+
+/* ENGINE PILLS */
+.engine-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.eng-btn {
+  background: transparent;
+  border: 1px solid rgba(var(--acc-rgb), 0.2);
+  border-radius: 50px;
+  padding: 5px 15px;
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all .2s;
+}
+.eng-btn:hover { border-color: var(--acc); color: var(--acc); }
+.eng-btn.active { background: var(--acc); border-color: var(--acc); color: #fff; }
+
+/* TOP BAR (lang + settings button) */
+.topbar { display: flex; align-items: center; gap: 8px; }
+.lang-toggle { display: flex; background: var(--bg3); border: 1px solid var(--border); border-radius: 50px; padding: 3px; }
+.lang-toggle button {
+  background: transparent; border: none; border-radius: 50px;
+  padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--text2); cursor: pointer; font-family: var(--font); transition: all .2s;
+}
+.lang-toggle button.on { background: var(--acc); color: #fff; }
+.btn-cog {
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 50px;
+  padding: 9px 18px; color: var(--text2); font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: var(--font); display: flex; align-items: center;
+  gap: 7px; transition: all .2s; letter-spacing: 0.5px;
+}
+.btn-cog:hover { border-color: var(--acc); color: var(--acc); }
+.btn-cog svg { width: 14px; height: 14px; stroke: currentColor; fill: none; flex-shrink: 0; }
+
+/* SETTINGS PANEL */
+.sett-panel {
+  width: 100%; max-width: 680px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .35s cubic-bezier(.4,0,.2,1), padding .35s;
+  padding: 0 24px;
+}
+.sett-panel.open { max-height: 520px; padding: 22px 24px; }
+.sett-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.sett-group label {
+  display: block; font-size: 10px; font-weight: 800;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 9px;
+}
+.sett-group select {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px; color: var(--text);
+  font-size: 13px; font-family: var(--font); font-weight: 500;
+  width: 100%; outline: none; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  transition: border-color .2s;
+}
+.sett-group select:focus { border-color: var(--acc); }
+
+/* COLOR SWATCHES */
+.color-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+  border: 2.5px solid transparent; transition: all .2s;
+  outline: none;
+}
+.swatch:hover { transform: scale(1.12); }
+.swatch.sel { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 0 2px var(--acc); }
+
+/* DIVIDER IN SETTINGS */
+.sett-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.sett-foot { display: flex; align-items: center; justify-content: space-between; }
+.sett-hint { font-size: 11px; color: var(--text2); }
+.btn-save {
+  background: var(--acc); border: none; border-radius: 50px;
+  padding: 9px 26px; color: #fff; font-weight: 800; font-size: 12px;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; font-family: var(--font); transition: background .2s, transform .1s;
+}
+.btn-save:hover { background: var(--acc2); }
+.btn-save:active { transform: scale(0.97); }
+
+/* FEED COLUMNS */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 980px; }
+.panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 12px; border-bottom: 1px solid var(--border);
+}
+.panel-title { font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: var(--acc); }
+.panel-refresh {
+  background: transparent; border: none; color: var(--text2);
+  cursor: pointer; font-size: 17px; padding: 2px 6px; border-radius: 8px;
+  transition: all .2s; line-height: 1;
+}
+.panel-refresh:hover { color: var(--acc); background: rgba(var(--acc-rgb),0.1); }
+.panel-body { padding: 4px 0; }
+
+/* FEED ITEMS */
+.feed-item {
+  display: flex; gap: 12px; padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  text-decoration: none; color: inherit;
+  transition: background .15s;
+  cursor: pointer;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-item:hover { background: rgba(var(--acc-rgb), 0.08); }
+.feed-thumb {
+  width: 64px; height: 48px; border-radius: 8px;
+  object-fit: cover; flex-shrink: 0;
+  background: var(--bg3);
+}
+.feed-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.feed-title {
+  font-size: 12px; font-weight: 600; line-height: 1.45;
+  overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  color: var(--text);
+}
+.feed-meta { font-size: 10px; color: var(--text2); }
+.feed-tag {
+  display: inline-block; background: rgba(var(--acc-rgb),0.15);
+  color: var(--acc); font-size: 9px; font-weight: 800;
+  letter-spacing: 1px; text-transform: uppercase;
+  border-radius: 4px; padding: 2px 6px;
+}
+.feed-state { padding: 22px 18px; font-size: 12px; color: var(--text2); text-align: center; }
+.feed-err { color: var(--acc); }
+.feed-err a { color: var(--acc); text-decoration: underline; }
+.head-right { display: flex; align-items: center; gap: 10px; }
+.badge { font-size: 10px; color: var(--text2); font-weight: 600; }
+
+/* FOOTER */
+.footer { font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 2px; text-transform: uppercase; padding-top: 1rem; }
+
+/* RESPONSIVE */
+@media (max-width: 660px) {
+  .cols { grid-template-columns: 1fr; }
+  .sett-grid { grid-template-columns: 1fr; }
+  .logo-svg { width: 240px; }
+  .search-row { flex-direction: column; }
+  .btn-search { height: 44px; }
+}
+</style>
+</head>
+<body>
+<div class="page" id="app">
+
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <svg class="logo-svg" id="logo-svg" viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>.lf{font-family:'Montserrat',sans-serif;font-weight:900;font-size:92px}</style>
+      </defs>
+      <!-- Left ear -->
+      <g id="ear-l" transform="translate(175,3)">
+        <polygon points="0,55 24,0 48,55" fill="#1e1e28"/>
+        <polygon points="9,55 24,17 40,55" fill="#2a2a38"/>
+        <polygon id="ear-l-inner" points="15,52 24,23 34,52" fill="#f152a2" opacity="0.8"/>
+      </g>
+      <!-- Right ear -->
+      <g id="ear-r" transform="translate(228,0)">
+        <polygon points="0,55 24,0 48,55" fill="#1e1e28"/>
+        <polygon points="9,55 24,17 40,55" fill="#2a2a38"/>
+        <polygon id="ear-r-inner" points="15,52 24,23 34,52" fill="#f8b8de" opacity="0.8"/>
+      </g>
+      <!-- Outline -->
+      <text class="lf" x="4" y="122" fill="none" stroke="#0f0f13" stroke-width="9" stroke-linejoin="round">CHI-CHI</text>
+      <!-- Left CHI -->
+      <text class="lf" id="logo-left" x="4" y="122" fill="#e040a0">CHI-</text>
+      <!-- Right CHI -->
+      <text class="lf" id="logo-right" x="252" y="122" fill="#f8b8de">CHI</text>
+    </svg>
+    <div class="tagline" id="lbl-tagline">Search &amp; Gaming Hub</div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-outer">
+    <div class="search-row">
+      <div class="search-wrap">
+        <input type="search" id="q" placeholder="Hledej na webu..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+      </div>
+      <button class="btn-search" id="btn-s" onclick="doSearch()">Hledat</button>
+    </div>
+    <div class="engine-row" id="eng-row">
+      <button class="eng-btn active" data-url="https://www.google.com/search?q=" onclick="pickEng(this)">Google</button>
+      <button class="eng-btn" data-url="https://www.bing.com/search?q=" onclick="pickEng(this)">Bing</button>
+      <button class="eng-btn" data-url="https://duckduckgo.com/?q=" onclick="pickEng(this)">DuckDuckGo</button>
+      <button class="eng-btn" data-url="https://www.youtube.com/results?search_query=" onclick="pickEng(this)">YouTube</button>
+      <button class="eng-btn" data-url="https://www.twitch.tv/search?term=" onclick="pickEng(this)">Twitch</button>
+    </div>
+  </div>
+
+  <!-- TOP CONTROLS -->
+  <div class="topbar">
+    <button class="btn-cog" onclick="toggleSettings()" id="btn-cog">
+      <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span id="lbl-settings">Nastavení</span>
+    </button>
+    <div class="lang-toggle" id="lang-toggle">
+      <button class="on" onclick="setLang('cs',this)">CZ</button>
+      <button onclick="setLang('en',this)">EN</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div class="sett-panel" id="sett-panel">
+    <div class="sett-grid">
+      <div class="sett-group">
+        <label id="lbl-acc">Barva motivu</label>
+        <div class="color-row" id="swatches">
+          <div class="swatch sel" style="background:#f152a2" data-acc="#f152a2" data-acc2="#e040a0" data-light="#f8b8de" data-rgb="241,82,162" onclick="pickColor(this)" title="Pink"></div>
+          <div class="swatch" style="background:#a855f7" data-acc="#a855f7" data-acc2="#9333ea" data-light="#d8b4fe" data-rgb="168,85,247" onclick="pickColor(this)" title="Purple"></div>
+          <div class="swatch" style="background:#3b82f6" data-acc="#3b82f6" data-acc2="#2563eb" data-light="#93c5fd" data-rgb="59,130,246" onclick="pickColor(this)" title="Blue"></div>
+          <div class="swatch" style="background:#10b981" data-acc="#10b981" data-acc2="#059669" data-light="#6ee7b7" data-rgb="16,185,129" onclick="pickColor(this)" title="Green"></div>
+          <div class="swatch" style="background:#f59e0b" data-acc="#f59e0b" data-acc2="#d97706" data-light="#fcd34d" data-rgb="245,158,11" onclick="pickColor(this)" title="Amber"></div>
+          <div class="swatch" style="background:#ef4444" data-acc="#ef4444" data-acc2="#dc2626" data-light="#fca5a5" data-rgb="239,68,68" onclick="pickColor(this)" title="Red"></div>
+          <div class="swatch" style="background:#06b6d4" data-acc="#06b6d4" data-acc2="#0891b2" data-light="#67e8f9" data-rgb="6,182,212" onclick="pickColor(this)" title="Cyan"></div>
+          <div class="swatch" style="background:#f97316" data-acc="#f97316" data-acc2="#ea580c" data-light="#fdba74" data-rgb="249,115,22" onclick="pickColor(this)" title="Orange"></div>
+        </div>
+      </div>
+      <div class="sett-group">
+        <label id="lbl-theme">Téma</label>
+        <select id="theme-sel" onchange="applyTheme(this.value)">
+          <option value="dark">Tmavé (výchozí)</option>
+          <option value="amoled">AMOLED černá</option>
+          <option value="dim">Dim šedá</option>
+          <option value="light">Světlé</option>
+        </select>
+      </div>
+      <div class="sett-group">
+        <label id="lbl-news-src">Zdroj novinek</label>
+        <select id="news-src">
+          <option value="ign">IGN</option>
+          <option value="pcgamer">PC Gamer</option>
+          <option value="gamespot">GameSpot</option>
+          <option value="kotaku">Kotaku</option>
+        </select>
+      </div>
+      <div class="sett-group">
+        <label id="lbl-count">Počet článků</label>
+        <select id="item-count">
+          <option value="5">5</option>
+          <option value="8" selected>8</option>
+          <option value="12">12</option>
+        </select>
+      </div>
+    </div>
+    <hr class="sett-divider">
+    <div class="sett-foot">
+      <span class="sett-hint" id="lbl-hint">Nastavení se uloží lokálně</span>
+      <button class="btn-save" id="btn-save" onclick="saveSettings()">Uložit</button>
+    </div>
+  </div>
+
+  <!-- FEED COLUMNS -->
+  <div class="cols">
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title" id="lbl-news">Gaming News</span>
+        <div class="head-right">
+          <span class="badge" id="news-badge"></span>
+          <button class="panel-refresh" onclick="loadNews()" title="Refresh">&#8635;</button>
+        </div>
+      </div>
+      <div class="panel-body" id="news-feed"><div class="feed-state">Načítám novinky…</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title" id="lbl-free">Free Games</span>
+        <div class="head-right">
+          <button class="panel-refresh" onclick="loadFree()" title="Refresh">&#8635;</button>
+        </div>
+      </div>
+      <div class="panel-body" id="free-feed"><div class="feed-state">Načítám free hry…</div></div>
+    </div>
+  </div>
+
+  <div class="footer">Chi-Chi Search &bull; Made with ♥</div>
+</div>
+
+<script>
+var ENGINE = 'https://www.google.com/search?q=';
+var LANG = 'cs';
+var SETT_OPEN = false;
+
+var FEEDS = {
+  ign: 'https://feeds.feedburner.com/ign/news',
+  pcgamer: 'https://www.pcgamer.com/rss/',
+  gamespot: 'https://www.gamespot.com/feeds/mashup/',
+  kotaku: 'https://kotaku.com/rss'
+};
+var FREE_URL = 'https://www.epicbundle.com/feed/';
+var PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+var T = {
+  cs: {
+    placeholder:'Hledej na webu…', btn:'Hledat', tagline:'Search & Gaming Hub',
+    settings:'Nastavení', news:'Gaming News', free:'Free Games',
+    loading:'Načítám…', err:'Feed nedostupný —', errLink:'otevři online',
+    acc:'Barva motivu', theme:'Téma', newsSrc:'Zdroj novinek', count:'Počet článků',
+    hint:'Nastavení se uloží lokálně', save:'Uložit', saved:'Uloženo ✓',
+    themes:['Tmavé (výchozí)','AMOLED černá','Dim šedá','Světlé']
+  },
+  en: {
+    placeholder:'Search the web…', btn:'Search', tagline:'Search & Gaming Hub',
+    settings:'Settings', news:'Gaming News', free:'Free Games',
+    loading:'Loading…', err:'Feed unavailable —', errLink:'open online',
+    acc:'Accent color', theme:'Theme', newsSrc:'News source', count:'Article count',
+    hint:'Settings saved locally', save:'Save', saved:'Saved ✓',
+    themes:['Dark (default)','AMOLED black','Dim gray','Light']
+  }
+};
+
+function doSearch() {
+  var q = document.getElementById('q').value.trim();
+  if (q) window.open(ENGINE + encodeURIComponent(q), '_blank');
+}
+
+document.getElementById('q').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doSearch();
+});
+
+function pickEng(btn) {
+  document.querySelectorAll('.eng-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  ENGINE = btn.dataset.url;
+}
+
+function toggleSettings() {
+  SETT_OPEN = !SETT_OPEN;
+  document.getElementById('sett-panel').classList.toggle('open', SETT_OPEN);
+}
+
+function setLang(l, btn) {
+  LANG = l;
+  document.querySelectorAll('#lang-toggle button').forEach(function(b) { b.classList.remove('on'); });
+  btn.classList.add('on');
+  applyLang();
+}
+
+function applyLang() {
+  var t = T[LANG];
+  document.getElementById('q').placeholder = t.placeholder;
+  document.getElementById('btn-s').textContent = t.btn;
+  document.getElementById('lbl-tagline').textContent = t.tagline;
+  document.getElementById('lbl-settings').textContent = t.settings;
+  document.getElementById('lbl-news').textContent = t.news;
+  document.getElementById('lbl-free').textContent = t.free;
+  document.getElementById('lbl-acc').textContent = t.acc;
+  document.getElementById('lbl-theme').textContent = t.theme;
+  document.getElementById('lbl-news-src').textContent = t.newsSrc;
+  document.getElementById('lbl-count').textContent = t.count;
+  document.getElementById('lbl-hint').textContent = t.hint;
+  document.getElementById('btn-save').textContent = t.save;
+  var opts = document.getElementById('theme-sel').options;
+  t.themes.forEach(function(txt, i) { if (opts[i]) opts[i].text = txt; });
+  localStorage.setItem('cchi_lang', LANG);
+}
+
+function pickColor(el) {
+  document.querySelectorAll('.swatch').forEach(function(s) { s.classList.remove('sel'); });
+  el.classList.add('sel');
+  var r = document.documentElement.style;
+  r.setProperty('--acc', el.dataset.acc);
+  r.setProperty('--acc2', el.dataset.acc2);
+  r.setProperty('--acc-light', el.dataset.light);
+  r.setProperty('--acc-rgb', el.dataset.rgb);
+  updateLogo(el.dataset.acc, el.dataset.light);
+  localStorage.setItem('cchi_acc', JSON.stringify({acc:el.dataset.acc,acc2:el.dataset.acc2,light:el.dataset.light,rgb:el.dataset.rgb}));
+}
+
+function updateLogo(mainColor, lightColor) {
+  var ll = document.getElementById('logo-left');
+  var lr = document.getElementById('logo-right');
+  var el = document.getElementById('ear-l-inner');
+  var er = document.getElementById('ear-r-inner');
+  if (ll) ll.setAttribute('fill', mainColor);
+  if (lr) lr.setAttribute('fill', lightColor);
+  if (el) el.setAttribute('fill', mainColor);
+  if (er) er.setAttribute('fill', lightColor);
+}
+
+function applyTheme(v) {
+  var r = document.documentElement.style;
+  if (v === 'amoled') {
+    r.setProperty('--bg','#000'); r.setProperty('--bg2','#080808'); r.setProperty('--bg3','#101010');
+    r.setProperty('--text','#fff'); r.setProperty('--text2','rgba(255,255,255,0.5)');
+  } else if (v === 'dim') {
+    r.setProperty('--bg','#1a1a22'); r.setProperty('--bg2','#22222e'); r.setProperty('--bg3','#2a2a38');
+    r.setProperty('--text','#fff'); r.setProperty('--text2','rgba(255,255,255,0.5)');
+  } else if (v === 'light') {
+    r.setProperty('--bg','#f4f4f7'); r.setProperty('--bg2','#fff'); r.setProperty('--bg3','#eaeaf0');
+    r.setProperty('--text','#111'); r.setProperty('--text2','rgba(0,0,0,0.42)');
+  } else {
+    r.setProperty('--bg','#0f0f13'); r.setProperty('--bg2','#16161d'); r.setProperty('--bg3','#1e1e28');
+    r.setProperty('--text','#fff'); r.setProperty('--text2','rgba(255,255,255,0.5)');
+  }
+  localStorage.setItem('cchi_theme', v);
+}
+
+function saveSettings() {
+  var src = document.getElementById('news-src').value;
+  var cnt = parseInt(document.getElementById('item-count').value) || 8;
+  localStorage.setItem('cchi_src', src);
+  localStorage.setItem('cchi_cnt', cnt);
+  loadNews(src, cnt);
+  loadFree(cnt);
+  var btn = document.getElementById('btn-save');
+  btn.textContent = T[LANG].saved;
+  setTimeout(function() { btn.textContent = T[LANG].save; }, 1400);
+}
+
+async function fetchFeed(url, count) {
+  var res = await fetch(PROXY + encodeURIComponent(url) + '&count=' + (count || 10));
+  var d = await res.json();
+  return d.items || [];
+}
+
+function fmtDate(str) {
+  if (!str) return '';
+  try {
+    return new Date(str).toLocaleDateString(LANG === 'cs' ? 'cs-CZ' : 'en-GB', {day:'numeric',month:'short'});
+  } catch(e) { return ''; }
+}
+
+function renderItems(items, el) {
+  if (!items || !items.length) {
+    el.innerHTML = '<div class="feed-state feed-err">' + T[LANG].err + ' <a href="#" target="_blank">' + T[LANG].errLink + '</a></div>';
+    return;
+  }
+  el.innerHTML = items.map(function(item) {
+    var img = item.thumbnail || (item.enclosure && item.enclosure.link) || '';
+    var imgHtml = img ? '<img class="feed-thumb" src="' + img + '" loading="lazy" onerror="this.style.display=\'none\'">' : '';
+    return '<a class="feed-item" href="' + (item.link||'#') + '" target="_blank">'
+      + imgHtml
+      + '<div class="feed-info">'
+      + '<div class="feed-title">' + (item.title||'') + '</div>'
+      + '<div class="feed-meta">' + fmtDate(item.pubDate) + '</div>'
+      + '</div></a>';
+  }).join('');
+}
+
+async function loadNews(src, cnt) {
+  var el = document.getElementById('news-feed');
+  var src = src || document.getElementById('news-src').value;
+  var cnt = cnt || parseInt(document.getElementById('item-count').value) || 8;
+  el.innerHTML = '<div class="feed-state">' + T[LANG].loading + '</div>';
+  try {
+    var items = await fetchFeed(FEEDS[src] || FEEDS.ign, cnt);
+    document.getElementById('news-badge').textContent = items.length + (LANG==='cs'?' čl.':' art.');
+    renderItems(items.slice(0, cnt), el);
+  } catch(e) {
+    el.innerHTML = '<div class="feed-state feed-err">' + T[LANG].err + ' <a href="https://www.ign.com/news" target="_blank">IGN</a></div>';
+  }
+}
+
+async function loadFree(cnt) {
+  var el = document.getElementById('free-feed');
+  var cnt = cnt || parseInt(document.getElementById('item-count').value) || 8;
+  el.innerHTML = '<div class="feed-state">' + T[LANG].loading + '</div>';
+  try {
+    var items = await fetchFeed(FREE_URL, cnt);
+    renderItems(items.slice(0, cnt), el);
+  } catch(e) {
+    el.innerHTML = '<div class="feed-state feed-err">' + T[LANG].err + ' <a href="https://www.epicbundle.com" target="_blank">EpicBundle</a></div>';
+  }
+}
+
+// Load saved prefs
+(function() {
+  try {
+    var savedAcc = localStorage.getItem('cchi_acc');
+    if (savedAcc) {
+      var a = JSON.parse(savedAcc);
+      var r = document.documentElement.style;
+      r.setProperty('--acc', a.acc); r.setProperty('--acc2', a.acc2);
+      r.setProperty('--acc-light', a.light); r.setProperty('--acc-rgb', a.rgb);
+      updateLogo(a.acc, a.light);
+      document.querySelectorAll('.swatch').forEach(function(s) {
+        s.classList.toggle('sel', s.dataset.acc === a.acc);
+      });
+    }
+    var savedTheme = localStorage.getItem('cchi_theme');
+    if (savedTheme) {
+      applyTheme(savedTheme);
+      document.getElementById('theme-sel').value = savedTheme;
+    }
+    var savedLang = localStorage.getItem('cchi_lang');
+    if (savedLang && savedLang !== 'cs') {
+      LANG = savedLang;
+      document.querySelectorAll('#lang-toggle button').forEach(function(b,i) {
+        b.classList.toggle('on', (i===0&&LANG==='cs')||(i===1&&LANG==='en'));
+      });
+      applyLang();
+    }
+    var savedSrc = localStorage.getItem('cchi_src');
+    if (savedSrc) document.getElementById('news-src').value = savedSrc;
+    var savedCnt = localStorage.getItem('cchi_cnt');
+    if (savedCnt) document.getElementById('item-count').value = savedCnt;
+  } catch(e) {}
+})();
+
+loadNews();
+loadFree();
+</script>
+</body>
+</html>
